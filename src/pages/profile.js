@@ -1,6 +1,11 @@
 import React from 'react'
-import {Card} from 'react-bootstrap'
-import {Link} from 'react-router-dom'
+import { Card } from 'react-bootstrap'
+import { Navbar, Nav } from 'react-bootstrap'
+import { IoIosMenu } from 'react-icons/io';
+import { FiShoppingCart, FiLogOut } from 'react-icons/fi';
+import { FaUserAlt } from 'react-icons/fa';
+import { IconContext } from "react-icons";
+import { Link } from 'react-router-dom'
 
 export default class Profile extends React.Component {
     constructor(props) {
@@ -16,12 +21,10 @@ export default class Profile extends React.Component {
         let items = []
         var self = this;
         listRef.listAll().then((res) => {
-            console.log(res)
             res.prefixes.forEach(function(res) {
                 //
             })
             res.items.forEach((itemRef) => {
-                console.log(itemRef)
                 itemRef.getDownloadURL().then(function(url) {
                     var myitem = {
                         url: url,
@@ -52,61 +55,85 @@ export default class Profile extends React.Component {
         return placeholderItems
     }
 
-
+    logout = (evt) => {
+        var self = this;
+        this.props.firebase.auth().signOut().then(function() {
+          self.setState({user: false})
+          window.location.href = "/";
+            }).catch(function(error) {
+          alert(error.message)
+        })
+    } 
+      
     render() {
         return(
             <>
-            <div className="border-left border-right border-bottom-3 border-dark row">
-                    <strong className="mx-auto my-4">
-                        {this.props.user.email}
-                    </strong>    
-            </div>
-            <div>
-                {this.state.items.length > 0 
-                ?
-                <div>
-                    {this.state.items.length < 16
+                <Navbar bg="light" variant="light" className="border-bottom border-dark">
+                    <IconContext.Provider value={{ size: "3em", className:"m-3" }}>
+                        <Link style={{ textDecoration: 'none', color: 'black'}} to="/"><IoIosMenu/></Link>
+                        <Link style={{ textDecoration: 'none', color: 'black'}} to="/checkout"><FiShoppingCart /></Link>
+                        <Nav className="mx-auto">
+                             <Link style={{ textDecoration: 'none', color: 'gray'}} to="/home">RESOLD</Link>
+                        </Nav>
+                        <Link style={this.props.user ? { color: 'black' } : { color: 'gray'} } onClick={this.logout} disabled={!this.props.user}><FiLogOut /></Link>
+                        <Link style={{ textDecoration: 'none', color: 'black'}} to="/profile"><FaUserAlt /></Link>
+                    </IconContext.Provider>
+                </Navbar>
+                <div className="container">
+                    <div className="border-left border-right border-bottom-3 border-dark row">
+                            <strong className="mx-auto my-4">
+                                {this.props.user.email}
+                            </strong>    
+                    </div>
+                    <div>
+                        {this.state.items.length > 0 
                         ?
-                        <div className="row row-cols-4 row-cols-md-4 border border-dark" >
-                                {this.state.items.map(item => {
-                                    return (
-                                    <Card style={{ width: '18rem', border: 'none'}}>
-                                        <Link to="/checking"><Card.Img className="border border-dark" variant="top" src={item.url} /></Link>
-                                        <Card.Body>
-                                            <Card.Text><strong>Brand Name</strong></Card.Text>
-                                            <Card.Title><strong>Product Name</strong></Card.Title>
-                                            <Card.Text>$Price</Card.Text>
-                                        </Card.Body>
-                                    </Card>
-                                    )
-                                })}
-                                {this.placeholder()}
+                        <div>
+                            {this.state.items.length < 16
+                                ?
+                                <div className="row row-cols-4 row-cols-md-4 border border-dark" >
+                                        {this.state.items.map(item => {
+                                            let link = "/item-edit/" + item.ref.name
+                                            return (
+                                            <Card style={{ width: '18rem', border: 'none'}}>
+                                                <Link to={link}><Card.Img className="border border-dark" variant="top" src={item.url} /></Link>
+                                                <Card.Body>
+                                                    <Card.Text><strong>Brand Name</strong></Card.Text>
+                                                    <Card.Title><strong>Product Name</strong></Card.Title>
+                                                    <Card.Text>$Price</Card.Text>
+                                                </Card.Body>
+                                            </Card>
+                                            )
+                                        })}
+                                        {this.placeholder()}
+                                </div>
+                                :
+                                <div className="row row-cols-4 row-cols-md-4 border border-dark" >
+                                        {this.state.items.map(item => {
+                                            let link = "/item-edit/" + item.ref.name
+                                            return (
+                                            <Card style={{ width: '18rem', border: 'none'}}>
+                                                <Link to={link}><Card.Img className="border border-dark" variant="top" src={item.url} /></Link>
+                                                <Card.Body>
+                                                    <Card.Text><strong>Brand Name</strong></Card.Text>
+                                                    <Card.Title><strong>Product Name</strong></Card.Title>
+                                                    <Card.Text>$Price</Card.Text>
+                                                </Card.Body>
+                                            </Card>
+                                            )
+                                        })}
+                                </div>
+                            }
                         </div>
                         :
-                        <div className="row row-cols-4 row-cols-md-4 border border-dark" >
-                                {this.state.items.map(items => {
-                                    return (
-                                    <Card style={{ width: '18rem', border: 'none'}}>
-                                        <Link to="/checking"><Card.Img className="border border-dark" variant="top" src="https://via.placeholder.com/100px120" /></Link>
-                                        <Card.Body>
-                                            <Card.Text><strong>{items.brandName}</strong></Card.Text>
-                                            <Card.Title><strong>{items.productName}</strong></Card.Title>
-                                            <Card.Text>{items.price}</Card.Text>
-                                        </Card.Body>
-                                    </Card>
-                                    )
-                                })}
+                        <div>
+                            <div className="row row-cols-4 row-cols-md-4 border border-dark" >
+                                        {this.placeholder()}
+                                </div>
                         </div>
-                    }
+                        }
+                    </div>
                 </div>
-                :
-                <div>
-                     <div className="row row-cols-4 row-cols-md-4 border border-dark" >
-                                {this.placeholder()}
-                        </div>
-                </div>
-                }
-            </div>
             </>
         )
     }

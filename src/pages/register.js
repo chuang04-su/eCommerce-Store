@@ -6,7 +6,7 @@ import { FaUserAlt } from 'react-icons/fa';
 import { IconContext } from "react-icons";
 import { Link } from 'react-router-dom'
 
-export default class Login extends React.Component {
+export default class Register extends React.Component {
     constructor(props) {
         super(props);
         this.state={
@@ -25,7 +25,7 @@ export default class Login extends React.Component {
     } 
       
 
-    loginHandler = (evt) => {
+    registerHandler = (evt) => {
         evt.preventDefault();
         const formData = new FormData(evt.target);
         const user = {};
@@ -33,12 +33,11 @@ export default class Login extends React.Component {
         for (let pair of formData.entries()) {
             user[pair[0]] = pair[1];
         }
-        this.props.firebase.auth().signInWithEmailAndPassword(user.email, user.password)
-        .then(() => {
-            self.props.history.push('/profile')
-        })
-        .catch(function(error) {
+        this.props.firebase.auth().createUserWithEmailAndPassword(user.email, user.password).catch(function(error) {
+            // Handle Errors here.
             self.setState({error: error.message})
+        }).then(function(){
+            self.props.history.push("/home")
         });
     }
 
@@ -60,12 +59,12 @@ export default class Login extends React.Component {
                 <div className="container">
                     <div className="row h-100 align-items-center justify-content-center my-5">
                         <div className="col-12 col-sm-8 d-flex flex-column align-items-center">
-                            <h1><strong>LOGIN</strong></h1>
+                            <h1><strong>Register</strong></h1>
                             <h1 className="sr-only">Login</h1>
                             {this.state.error &&
                                 <p>{this.state.error}</p>
                             }
-                            <form className="form border border-dark p-5 mb-4 text-center" onSubmit={this.loginHandler}>
+                            <form className="form border border-dark p-5 mb-4 text-center" onSubmit={this.registerHandler}>
                                 <div className="form-group">
                                     <input type="text" style={{textAlign:"center"}} className="form-control" placeholder="Email" name="email" />
                                 </div>
@@ -74,7 +73,6 @@ export default class Login extends React.Component {
                                 </div>
                                 <button className="btn-outline-dark mx-auto" type="submit"><h3>ENTER</h3></button>
                             </form>
-                            <Link to="/register">Create new account</Link>
                         </div>
                     </div>
                 </div>

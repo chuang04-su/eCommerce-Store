@@ -22,7 +22,7 @@ var fb = firebase.initializeApp(firebaseConfig);
 
 ReactDOM.render(
   <React.StrictMode>
-    <App firebase={fb} />
+    <App firebase={fb}/>
   </React.StrictMode>,
   document.getElementById('root')
 );
